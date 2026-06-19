@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Delete Employees</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Poppins, sans-serif;
+      background: #f4f7fc;
+    }
+
+    h1 {
+      text-align: center;
+      color: #0d1b2a;
+      margin: 20px 0;
+    }
+
+    table {
+      width: 90%;
+      margin: auto;
+      border-collapse: collapse;
+      background: #fff;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid #ddd;
+      font-size: 14px;
+    }
+
+    th {
+      background: #0d1b2a;
+      color: white;
+    }
+
+    tr:hover {
+      background: #f1f1f1;
+    }
+
+    .delete-btn {
+      background: #e63946;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .delete-btn:hover {
+      background: #c1121f;
+    }
+
+    .top {
+      width: 90%;
+      margin: 20px auto;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    input {
+      padding: 10px;
+      width: 60%;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    button.print {
+      background: #0d1b2a;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>Delete Employees</h1>
+
+<div class="top">
+  <input type="text" id="searchInput" placeholder="Search employee..." onkeyup="searchEmployees()">
+  <button class="print" onclick="window.print()">Print</button>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Department</th>
+      <th>Email</th>
+      <th>Phone</th>
+      <th>Salary</th>
+      <th>Paid</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+
+  <tbody id="tbody"></tbody>
+</table>
+
+<script>
+
+let employees = [];
+
+function loadEmployees() {
+  employees = JSON.parse(localStorage.getItem("employees") || "[]");
+  render(employees);
+}
+
+function render(data) {
+  const tbody = document.getElementById("tbody");
+  tbody.innerHTML = "";
+
+  if (data.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="8" style="text-align:center;padding:20px;">
+          No Employees Found
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  data.forEach(emp => {
+    tbody.innerHTML += `
+      <tr>
+        <td>${emp.id}</td>
+        <td>${emp.name}</td>
+        <td>${emp.department}</td>
+        <td>${emp.email}</td>
+        <td>${emp.phone}</td>
+        <td>${emp.salary}</td>
+        <td>${emp.paid}</td>
+        <td>
+          <button class="delete-btn" onclick="deleteEmployee('${emp.id}')">
+            <i class="fa fa-trash"></i> Delete
+          </button>
+        </td>
+      </tr>
+    `;
+  });
+}
+
+function deleteEmployee(id) {
+  if (!confirm("Are you sure you want to delete this employee?")) return;
+
+  employees = employees.filter(emp => emp.id !== id);
+
+  localStorage.setItem("employees", JSON.stringify(employees));
+
+  render(employees);
+}
+
+function searchEmployees() {
+  const val = document.getElementById("searchInput").value.toLowerCase();
+
+  const filtered = employees.filter(emp =>
+    emp.id.toLowerCase().includes(val) ||
+    emp.name.toLowerCase().includes(val) ||
+    emp.department.toLowerCase().includes(val) ||
+    emp.email.toLowerCase().includes(val)
+  );
+
+  render(filtered);
+}
+
+window.onload = loadEmployees;
+
+</script>
+
+</body>
+</html>
