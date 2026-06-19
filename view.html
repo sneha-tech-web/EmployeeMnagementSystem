@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Employee Management System</title>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
+    body {
+      margin:0;
+      font-family:'Poppins', sans-serif;
+      background:#f4f7fc;
+    }
+
+    h1 {
+      text-align:center;
+      margin:15px;
+      color:#0d1b2a;
+    }
+
+    .top-bar {
+      width:95%;
+      margin:auto;
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      padding:10px;
+      flex-wrap:wrap;
+    }
+
+    input {
+      padding:10px;
+      border-radius:8px;
+      border:1px solid #ccc;
+    }
+
+    button {
+      padding:10px 12px;
+      border:none;
+      border-radius:8px;
+      cursor:pointer;
+      color:white;
+    }
+
+    .btn-print { background:#0d1b2a; }
+    .btn-back { background:#1b9aaa; }
+    .btn-edit { background:#f4a261; }
+
+    table {
+      width:95%;
+      margin:auto;
+      border-collapse: collapse;
+      background:white;
+      box-shadow:0 0 15px rgba(0,0,0,0.1);
+    }
+
+    th, td {
+      padding:10px;
+      font-size:13px;
+      border-bottom:1px solid #ddd;
+    }
+
+    th {
+      background:#0d1b2a;
+      color:white;
+    }
+
+    .paid { color:green; font-weight:bold; }
+    .unpaid { color:red; font-weight:bold; }
+  </style>
+</head>
+
+<body>
+
+<h1>Employee Management System</h1>
+
+<div class="top-bar">
+
+  <input type="text" id="searchInput" placeholder="Search..." onkeyup="searchTable()">
+
+  <div>
+    <button class="btn-back" onclick="resetTable()">Back</button>
+    <button class="btn-print" onclick="window.print()">Print</button>
+  </div>
+
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Position</th>
+      <th>Department</th>
+      <th>Email</th>
+      <th>Phone</th>
+      <th>Address</th>
+      <th>Education</th>
+      <th>Aadhar</th>
+      <th>Salary (₹)</th>
+      <th>Paid</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+
+  <tbody id="tbody"></tbody>
+</table>
+
+<script>
+
+let allEmployees = [];
+
+/* LOAD */
+function loadEmployees() {
+
+  let employees = JSON.parse(localStorage.getItem("employees") || "[]");
+
+  if (employees.length === 0) {
+    employees = [
+      {
+        id:"E001",
+        name:"Aaradhya Sharma",
+        position:"Manager",
+        department:"HR",
+        email:"aaradhya@company.com",
+        phone:"9876543210",
+        address:"Koramangala, Bangalore",
+        education:"MBA HR",
+        aadhar:"1234-5678-9012",
+        salary:55000,
+        paid:"yes"
+      },
+      {
+        id:"E002",
+        name:"Diya Reddy",
+        position:"Developer",
+        department:"IT",
+        email:"diya@company.com",
+        phone:"9876543211",
+        address:"Whitefield, Bangalore",
+        education:"B.Tech CSE",
+        aadhar:"2345-6789-0123",
+        salary:60000,
+        paid:"no"
+      }
+    ];
+
+    localStorage.setItem("employees", JSON.stringify(employees));
+  }
+
+  allEmployees = employees;
+  render(allEmployees);
+}
+
+/* RENDER */
+function render(data) {
+  let tbody = document.getElementById("tbody");
+  tbody.innerHTML = "";
+
+  data.forEach((emp, index) => {
+
+    tbody.innerHTML += `
+      <tr>
+
+        <td><input id="id${index}" value="${emp.id}"></td>
+
+        <td><input id="name${index}" value="${emp.name || ""}"></td>
+        <td><input id="pos${index}" value="${emp.position || ""}"></td>
+        <td><input id="dep${index}" value="${emp.department || ""}"></td>
+        <td><input id="email${index}" value="${emp.email || ""}"></td>
+        <td><input id="phone${index}" value="${emp.phone || ""}"></td>
+        <td><input id="addr${index}" value="${emp.address || ""}"></td>
+        <td><input id="edu${index}" value="${emp.education || ""}"></td>
+        <td><input id="aadhar${index}" value="${emp.aadhar || ""}"></td>
+        <td><input id="sal${index}" value="${emp.salary || 0}"></td>
+
+        <td class="${emp.paid === 'yes' ? 'paid' : 'unpaid'}">
+          ${emp.paid || "no"}
+        </td>
+
+        <td>
+          <button class="btn-edit" onclick="updateEmployee(${index})">Save</button>
+        </td>
+
+      </tr>
+    `;
+  });
+}
+
+/* UPDATE (NOW INCLUDES ID EDIT) */
+function updateEmployee(index) {
+
+  allEmployees[index] = {
+    ...allEmployees[index],
+
+    id: document.getElementById("id"+index).value || "E000",
+
+    name: document.getElementById("name"+index).value || "Not Set",
+    position: document.getElementById("pos"+index).value || "Not Set",
+    department: document.getElementById("dep"+index).value || "Not Set",
+    email: document.getElementById("email"+index).value || "Not Set",
+    phone: document.getElementById("phone"+index).value || "0000000000",
+    address: document.getElementById("addr"+index).value || "Bangalore",
+    education: document.getElementById("edu"+index).value || "Not Provided",
+    aadhar: document.getElementById("aadhar"+index).value || "XXXX-XXXX-XXXX",
+    salary: Number(document.getElementById("sal"+index).value) || 0
+  };
+
+  localStorage.setItem("employees", JSON.stringify(allEmployees));
+
+  alert("Employee Updated Successfully ✅");
+
+  render(allEmployees);
+}
+
+/* SEARCH */
+function searchTable() {
+  let val = document.getElementById("searchInput").value.toLowerCase();
+
+  let filtered = allEmployees.filter(emp =>
+    (emp.id || "").toLowerCase().includes(val) ||
+    (emp.name || "").toLowerCase().includes(val) ||
+    (emp.department || "").toLowerCase().includes(val) ||
+    (emp.email || "").toLowerCase().includes(val)
+  );
+
+  render(filtered);
+}
+
+/* RESET */
+function resetTable() {
+  document.getElementById("searchInput").value = "";
+  render(allEmployees);
+}
+
+window.onload = loadEmployees;
+
+</script>
+
+</body>
+</html>
