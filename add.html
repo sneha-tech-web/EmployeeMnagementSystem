@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Add Employee</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
+    body {
+      margin:0;
+      font-family:'Poppins', sans-serif;
+      background:#f4f7fc;
+      display:flex;
+    }
+
+    .sidebar {
+      width:240px;
+      background:#0d1b2a;
+      color:#fff;
+      height:100vh;
+      position:fixed;
+      padding-top:40px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+    }
+
+    .sidebar a {
+      display:flex;
+      align-items:center;
+      width:80%;
+      color:#fff;
+      padding:15px;
+      margin-bottom:15px;
+      border-radius:8px;
+      text-decoration:none;
+      font-weight:500;
+      transition:all 0.3s;
+    }
+
+    .sidebar a:hover {
+      background:#1b2a45;
+      transform:translateX(5px);
+    }
+
+    .sidebar a i {
+      margin-right:12px;
+      font-size:1.2rem;
+    }
+
+    .main {
+      margin-left:240px;
+      padding:30px 40px;
+      width:calc(100% - 240px);
+    }
+
+    .main h1 {
+      color:#0d1b2a;
+      margin-bottom:30px;
+    }
+
+    .form-box {
+      background:rgba(255,255,255,0.95);
+      padding:30px;
+      border-radius:12px;
+      width:420px;
+      box-shadow:0 0 20px rgba(0,0,0,0.2);
+    }
+
+    .form-box input,
+    .form-box select {
+      width:90%;
+      padding:10px;
+      margin:10px 0;
+      border-radius:6px;
+      border:1px solid #ccc;
+    }
+
+    .form-box button {
+      background:#007bff;
+      color:white;
+      border:none;
+      padding:10px;
+      width:100%;
+      border-radius:6px;
+      cursor:pointer;
+      transition: background 0.3s ease;
+    }
+
+    .form-box button:hover {
+      background:#0056b3;
+    }
+
+    @media(max-width:768px){
+      .sidebar{
+        position:relative;
+        width:100%;
+        height:auto;
+        flex-direction:row;
+        flex-wrap:wrap;
+        justify-content:center;
+        padding:10px 0;
+      }
+      .sidebar a{width:45%;margin-bottom:10px;}
+      .main{margin-left:0;width:100%;padding:20px;}
+      .form-box{width:100%;}
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="sidebar">
+  <a href="dashboard.html"><i class="fa fa-home"></i> Dashboard</a>
+  <a href="view.html"><i class="fa fa-users"></i> View Employees</a>
+  <a href="login.html"><i class="fa fa-right-from-bracket"></i> Logout</a>
+</div>
+
+<div class="main">
+  <h1>Add New Employee</h1>
+
+  <div class="form-box">
+    <form id="addEmployeeForm">
+
+      <input type="text" name="id" placeholder="Employee ID (auto or manual)">
+      <input type="text" name="name" placeholder="Full Name" required>
+      <input type="text" name="position" placeholder="Position" required>
+      <input type="text" name="department" placeholder="Department" required>
+      <input type="email" name="email" placeholder="Email" required>
+      <input type="tel" name="phone" placeholder="Phone Number" required>
+
+      <input type="text" name="address" placeholder="Address">
+      <input type="text" name="education" placeholder="Education">
+      <input type="text" name="aadhar" placeholder="Aadhar Number">
+      <input type="number" name="salary" placeholder="Salary">
+
+      <select name="paid">
+        <option value="yes">Paid</option>
+        <option value="no" selected>Unpaid</option>
+      </select>
+
+      <button type="submit">Add Employee</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  const form = document.getElementById('addEmployeeForm');
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+
+    let employees = JSON.parse(localStorage.getItem('employees') || '[]');
+
+    // Auto ID if empty
+    let newId = form.id.value.trim();
+    if (!newId) {
+      newId = "E" + String(employees.length + 1).padStart(3, '0');
+    }
+
+    const emp = {
+      id: newId,
+      name: form.name.value,
+      position: form.position.value,
+      department: form.department.value,
+      email: form.email.value,
+      phone: form.phone.value,
+      address: form.address.value,
+      education: form.education.value,
+      aadhar: form.aadhar.value,
+      salary: Number(form.salary.value) || 0,
+      paid: form.paid.value
+    };
+
+    // Prevent duplicate email
+    if (employees.some(e => e.email === emp.email)) {
+      alert("❌ Email already exists!");
+      return;
+    }
+
+    employees.push(emp);
+    localStorage.setItem('employees', JSON.stringify(employees));
+
+    alert('✅ Employee added successfully!');
+    form.reset();
+  });
+</script>
+
+</body>
+</html>
